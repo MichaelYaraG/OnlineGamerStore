@@ -7,8 +7,11 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/OnlineGamerStoreAdmin.styles.css" asp-append-version="true" />
+    <script src="~/fontawesome/all.js"></script>
+    <script src="~/fontawesome/all.min.js"></script>
+
 </head>
-<body>
+<body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
         <a class="navbar-brand ps-3" href="index.html">Start Bootstrap</a>
@@ -110,23 +113,16 @@
                     @RenderBody()
                 </div>
             </main>
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
+            <footer class="border-top footer text-muted">
+                <div class="container">
+                    &copy; 2025 - OnlineGamerStoreAdmin - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidad</a>
                 </div>
             </footer>
         </div>
     </div>
 
 
-@*     <li class="nav-item">
+    @*     <li class="nav-item">
         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
     </li>
     <li class="nav-item">
@@ -135,22 +131,14 @@
     <li class="nav-item">
         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="About">Sobre Nosotros</a>
     </li> *@
- @*    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div> *@
 
-  @*   <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - OnlineGamerStoreAdmin - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidad</a>
-        </div>
-    </footer> *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/scripts.js" asp-append-version="true"></script>
     <script src="~/js/scripts.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)scripts
+    <script src="~/fontawesome/all.js"></script>
+    <script src="~/fontawesome/all.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
