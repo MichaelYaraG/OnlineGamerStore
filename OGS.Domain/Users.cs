@@ -17,7 +17,7 @@ namespace OGS.Domain
         public string NombreCompleto { get; set; }
         public string CorreoElectronico { get; set; }
         public string Contraseña { get; set; }
-        public DateTime FechaNacimineto { get; set; }  
+        public DateTime FechaNacimiento { get; set; }  
         public Sexo IDSexo { get; set; }
         public int Telefono { get; set; }
         public bool Estado {  get; set; }

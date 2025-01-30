@@ -13,6 +13,7 @@ namespace OGS.Domain
         public Users IDUser { get; set; }
         public TipoDocumento IDTipoDocumento { get; set; }
         public int NumeroDocumento { get; set; }
+        public string NombreCompleto { get; set; }
         
     }
 }

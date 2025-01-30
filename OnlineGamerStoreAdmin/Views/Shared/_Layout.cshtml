@@ -14,7 +14,7 @@
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="index.html">OGStore</a>
+        <a class="navbar-brand ps-3" asp-area="" asp-controller="Home" asp-action="Index">OGStore</a>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
         <!-- Navbar Search-->
@@ -42,29 +42,29 @@
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <div class="sb-sidenav-menu-heading">Información General</div>
-                        <a class="nav-link" href="index.html">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="DetalleVentas">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Detalle de ventas
                         </a>
-                        <a class="nav-link" href="index.html">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Clientes">
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Clientes
                         </a>
 
                         <div class="sb-sidenav-menu-heading">ADMINISTRACIÓN</div>
-                        <a class="nav-link" href="charts.html">
+                        <a class="nav-link" asp-area="" asp-controller="Administration" asp-action="Categorias">
                             <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                             Categorias
                         </a>
-                        <a class="nav-link" href="tables.html">
+                        <a class="nav-link" asp-area="" asp-controller="Administration" asp-action="Marcas">
                             <div class="sb-nav-link-icon"><i class="fas fa-bookmark"></i></div>
-                            Marca
+                            Marcas
                         </a>
-                        <a class="nav-link" href="tables.html">
+                        <a class="nav-link" asp-area="" asp-controller="Administration" asp-action="Productos">
                             <div class="sb-nav-link-icon"><i class="fas fa-book"></i></div>
-                            Producto
+                            Productos
                         </a>
-                        <a class="nav-link" href="tables.html">
+                        <a class="nav-link" asp-area="" asp-controller="Administration" asp-action="GenerarVenta">
                             <div class="sb-nav-link-icon"><i class="fas fa-credit-card"></i></div>
                             Generar Venta
                         </a>
@@ -84,7 +84,7 @@
             </main>
             <footer class="border-top footer text-muted">
                 <div class="container">
-                    &copy; 2025 - OnlineGamerStoreAdmin - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidad</a>
+                    &copy; 2025 - OGStoreAdmin - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidad</a>
                 </div>
             </footer>
         </div>

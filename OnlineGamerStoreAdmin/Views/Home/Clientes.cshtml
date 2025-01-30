@@ -1,0 +1,25 @@
+﻿@model List<OGS.Domain.Clientes>
+<div class="text-center">
+    <h1 class="display-4">Clientes</h1>
+</div>
+<h2>Clientes Registrados</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>NumeroDocumento</th>
+            <th>NombreCompleto</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cliente in Model)
+        {
+            <tr>
+                <td>@cliente.IDCliente</td>
+                <td>@cliente.NumeroDocumento</td>
+                <td>@cliente.NombreCompleto</td>
+            </tr>
+        }
+    </tbody>
+</table>
