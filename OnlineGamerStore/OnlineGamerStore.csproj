@@ -26,5 +26,7 @@
     <ProjectReference Include="..\OGS.Infraestructure\OGS.Infraestructure.csproj" />
     <ProjectReference Include="..\OnlineGamerStoreAdmin\OnlineGamerStoreAdmin.csproj" />
   </ItemGroup>
-
+	<PropertyGroup>
+		<StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
+	</PropertyGroup>
 </Project>
