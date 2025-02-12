@@ -10,13 +10,15 @@ using OGS.Infraestructure;
 
 namespace OGS.Application
 {
-    public class App_Usuarios
+    public class ClienteService
     {
-        private INF_Usuarios objUsuarios = new INF_Usuarios();
+        private readonly ClienteRepository _clienteRepository;
 
-        public List<Users> Listar()
+        public ClienteService(ClienteRepository clienteRepository)
         {
-            return objUsuarios.Listar();
+            _clienteRepository = clienteRepository;
         }
+
+
     }
 }

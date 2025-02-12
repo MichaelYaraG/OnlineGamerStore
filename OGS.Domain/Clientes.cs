@@ -16,4 +16,19 @@ namespace OGS.Domain
         public string NombreCompleto { get; set; }
         
     }
+
+    //Creación de Entidad con Campos Extras 
+
+    public class ClientesDTO
+    {
+        public int IDCliente { get; set; }
+        public TipoDocumento IDTipoDocumento { get; set; }
+        public string Abreviatura {  get; set; }
+        public int NumeroDocumento { get; set; }
+        public string NombreCompleto { get; set; }
+        public DateTime FechaNacimiento { get; set; }
+        public string CorreoElectronico { get; set; }
+
+
+    }
 }

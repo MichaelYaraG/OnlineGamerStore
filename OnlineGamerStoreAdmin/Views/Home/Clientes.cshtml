@@ -1,25 +1,38 @@
-﻿@model List<OGS.Domain.Clientes>
+﻿
 <div class="text-center">
-    <h1 class="display-4">Clientes</h1>
-</div>
-<h2>Clientes Registrados</h2>
+    <h2>Clientes</h2>
+    <ol class="breadcrumb mb-4 mt-4">
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>NumeroDocumento</th>
-            <th>NombreCompleto</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var cliente in Model)
-        {
-            <tr>
-                <td>@cliente.IDCliente</td>
-                <td>@cliente.NumeroDocumento</td>
-                <td>@cliente.NombreCompleto</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+        <li class="breadcrumb-item active">Charts</li>
+    </ol>
+
+</div>
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-users me-1"></i> Lista de Clientes
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-success">Nuevo</button>
+            </div>
+        </div>
+        <hr />
+        <table id="tbclientes" class="display cell-border" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>IDCliente</th>
+                    <th>Tipo de Documento</th>
+                    <th>Número de Documento</th>
+                    <th>NombreCompleto</th>
+                    <th>Fecha De Nacimiento</th>
+                    <th>Edad</th>
+                </tr>
+                
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
