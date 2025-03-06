@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -24,7 +24,6 @@
     <ProjectReference Include="..\OGS.Application\OGS.Application.csproj" />
     <ProjectReference Include="..\OGS.Domain\OGS.Domain.csproj" />
     <ProjectReference Include="..\OGS.Infraestructure\OGS.Infraestructure.csproj" />
-    <ProjectReference Include="..\OnlineGamerStoreAdmin\OnlineGamerStoreAdmin.csproj" />
   </ItemGroup>
 	<PropertyGroup>
 		<StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>

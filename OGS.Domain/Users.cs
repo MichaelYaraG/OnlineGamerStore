@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace OGS.Domain
 {
     public class Users
     {
+        [Key]
         public int IDUsuario { get; set; }
         public TipoDocumento IDTipoDocumento { get; set; }
         public string Nombre1 { get; set; }

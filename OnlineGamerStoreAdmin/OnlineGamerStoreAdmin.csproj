@@ -32,4 +32,8 @@
     <ProjectReference Include="..\OGS.Infraestructure\OGS.Infraestructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Imagenes\" />
+  </ItemGroup>
+
 </Project>

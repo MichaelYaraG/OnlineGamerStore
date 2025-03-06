@@ -5,6 +5,8 @@ using Microsoft.Extensions.Hosting;
 using OGS.Infraestructure;
 using OGS.Application;
 using OGS.Domain;
+using OGS.Infraestructure.Repository;
+using OGS.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Agregar controladores y vistas
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
+
+//AGREGO LAS REFERENCIAS A LOS REPOSITORIOS Y SERVICIOS
+builder.Services.AddScoped<MarcaRepository>();
+builder.Services.AddScoped<MarcaService>();
+builder.Services.AddScoped<CategoriaRepository>();
+builder.Services.AddScoped<CategoriaService>();
+builder.Services.AddScoped<ProductoRepository>();
+builder.Services.AddScoped<ProductoService>();
+builder.Services.AddScoped<ClienteRepository>();
+builder.Services.AddScoped<ClienteService>();
+
 
 // Construir la aplicación
 var app = builder.Build();

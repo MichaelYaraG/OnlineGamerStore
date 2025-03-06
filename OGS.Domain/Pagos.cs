@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace OGS.Domain
 {
     public class Pagos
     {
-
+        [Key]
         public int IDPago { get; set; }
         public Clientes IDCliente { get; set; }
         public string IDTransaccion { get; set; }

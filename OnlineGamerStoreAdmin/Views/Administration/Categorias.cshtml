@@ -1,3 +1,204 @@
-﻿<div class="text-center">
-    <h1 class="display-4">Administración de Categorias</h1>
-</div>
+﻿﻿@{
+    ViewData["Title"] = "Lista de Categorías";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/OnlineGamerStoreAdmin.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Categorias.css" asp-append-version="true" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <div class="card">
+        <h2 class="card-header">Administración De Categorías</h2>
+        <div class="card-body">
+            <div id="app">
+                <button type="button" class="btn btn-success" @@click="abrirModalNueva">Nueva Categoría</button>
+                <hr />
+                <h5>Lista de Categorías</h5>
+                <table v-if="categorias.length > 0" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th @@click="ordenarPor('idCategoria')">ID</th>
+                            <th @@click="ordenarPor('descripcionCategoria')">Descripción</th>
+                            <th @@click="ordenarPor('estado')">Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="categoria in categoriasPaginadas" :key="categoria.idCategoria">
+                            <td>{{ categoria.idCategoria }}</td>
+                            <td>{{ categoria.descripcionCategoria }}</td>
+                            <td>{{ categoria.estado ? 'Activo' : 'Inactivo' }}</td>
+                            <td>
+                                <button class="btn btn-primary" @@click="abrirModal(categoria)">Editar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p v-else>Cargando categorías...</p>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item" :class="{ disabled: paginaActual === 1 }">
+                            <a class="page-link" href="#" @@click.prevent="paginaActual--">&laquo;</a>
+                        </li>
+                        <li v-for="pagina in totalPaginas" :key="pagina" class="page-item" :class="{ active: pagina === paginaActual }">
+                            <a class="page-link" href="#" @@click.prevent="paginaActual = pagina">{{ pagina }}</a>
+                        </li>
+                        <li class="page-item" :class="{ disabled: paginaActual === totalPaginas }">
+                            <a class="page-link" href="#" @@click.prevent="paginaActual++">&raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Modal para editar categoría -->
+                <div :class="['modal', { mostrar: mostrarModal } ]" @@click.self="cerrarModal">
+                    <div class="modal-contenido">
+                        <span class="cerrar" @@click="cerrarModal">&times;</span>
+                        <h3>{{ esNuevaCategoria ? 'Nueva Categoría' : 'Editar Categoría' }}</h3>
+                        <label>Descripción:</label>
+                        <input type="text" v-model="categoriaSeleccionada.descripcionCategoria" class="form-control"><br>
+                        <label>Activo:</label>
+                        <select v-model="categoriaSeleccionada.estado" class="form-control">
+                            <option :value="true">Activo</option>
+                            <option :value="false">Inactivo</option>
+                        </select><br>
+                        <button class="btn btn-success mt-2" @@click="guardarCambios">Guardar</button>
+                    </div>
+                </div>
+
+                <!-- Modal para nueva categoría -->
+                <div :class="['modal', { mostrar: mostrarModalNueva } ]" @@click.self="cerrarModalNueva">
+                    <div class="modal-contenido">
+                        <span class="cerrar" @@click="cerrarModalNueva">&times;</span>
+                        <h3>Nueva Categoría</h3>
+                        <label>Descripción:</label>
+                        <input type="text" v-model="nuevaCategoria.descripcionCategoria" class="form-control"><br>
+                        <label>Activo:</label>
+                        <select v-model="nuevaCategoria.estado" class="form-control">
+                            <option :value="true">Activo</option>
+                            <option :value="false">Inactivo</option>
+                        </select><br>
+                        <button class="btn btn-success mt-2" @@click="guardarNuevaCategoria">Guardar</button>
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </div>
+    </div>
+
+    <!-- SCRIPT Vue.js PARA CATEGORIAS -->
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    categorias: [],
+                    paginaActual: 1,
+                    registrosPorPagina: 15,
+                    ordenAsc: true,
+                    columnaOrden: '',
+                    mostrarModal: false,
+                    mostrarModalNueva: false,
+                    categoriaSeleccionada: {},
+                    nuevaCategoria: { descripcionCategoria: '', estado: true }
+                };
+            },
+            mounted() {
+                this.obtenerCategorias();
+            },
+                computed: {
+            totalPaginas() {
+                return Math.ceil(this.categorias.length / this.registrosPorPagina);
+            },
+            categoriasPaginadas() {
+                const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
+                const fin = inicio + this.registrosPorPagina;
+                return this.categorias.slice(inicio, fin);
+            }
+        },
+            methods: {
+                async obtenerCategorias() {
+                    try {
+                        const response = await axios.get('/Administration/Categorias', {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        this.categorias = response.data;
+                    } catch (error) {
+                        console.error('Error al obtener categorías:', error);
+                    }
+                },
+                ordenarPor(columna) {
+                    if (this.columnaOrden === columna) {
+                        this.ordenAsc = !this.ordenAsc;
+                    } else {
+                        this.columnaOrden = columna;
+                        this.ordenAsc = true;
+                    }
+                    this.categorias.sort((a, b) => {
+                        let valA = a[columna];
+                        let valB = b[columna];
+
+                        if (typeof valA === 'string') valA = valA.toLowerCase();
+                        if (typeof valB === 'string') valB = valB.toLowerCase();
+
+                        return this.ordenAsc ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
+                    });
+                },
+                abrirModal(categoria) {
+                    this.categoriaSeleccionada = { ...categoria };
+                    this.mostrarModal = true;
+                },
+                cerrarModal() {
+                    this.mostrarModal = false;
+                },
+                abrirModalNueva() {
+                    this.nuevaCategoria = { descripcionCategoria: '', estado: true };
+                    this.mostrarModalNueva = true;
+                },
+                cerrarModalNueva() {
+                    this.mostrarModalNueva = false;
+                },
+                async guardarCambios() {
+                    try {
+                        const response = await axios.put('/Administration/ActualizarCategoria', this.categoriaSeleccionada);
+                        alert(response.data);
+                        this.cerrarModal();
+                        this.obtenerCategorias(); // Actualiza la lista
+                    } catch (error) {
+                        console.error('Error al actualizar la categoría:', error);
+                        alert('Error al actualizar la categoría');
+                    }
+                },
+                async guardarNuevaCategoria() {
+                    try {
+                        const response = await axios.post('/Administration/CrearCategoria', this.nuevaCategoria);
+                        alert(response.data);
+                        this.cerrarModalNueva();
+                        this.obtenerCategorias(); // Actualiza la lista
+                    } catch (error) {
+                        console.error('Error al crear la categoría:', error);
+                        alert('Error al crear la categoría');
+                    }
+                },
+                 cambiarPagina(pagina) {
+            if (pagina >= 1 && pagina <= this.totalPaginas) {
+                this.paginaActual = pagina;
+            }
+        }
+            }
+        });
+        app.mount('#app');
+    </script>
+
+    <!-- FIN SCRIPT Vue.js PARA CATEGORIAS -->
+</body>
+</html>
