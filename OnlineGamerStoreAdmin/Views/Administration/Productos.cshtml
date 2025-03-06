@@ -1,3 +1,223 @@
-﻿<div class="text-center">
-    <h1 class="display-4">Administración de Productos</h1>
-</div>
+﻿﻿@{
+    ViewData["Title"] = "Lista de Productos";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/OnlineGamerStoreAdmin.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Productos.css" asp-append-version="true" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <div class="card">
+        <h2 class="card-header">Administración De Productos</h2>
+        <div class="card-body">
+            <div id="app">
+                <button type="button" class="btn btn-success" @@click="abrirModalNueva">Nuevo Producto</button>
+                <hr />
+                <h5>Lista de Productos</h5>
+                <table v-if="productos.length > 0" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th @@click="ordenarPor('idProducto')">ID</th>
+                            <th @@click="ordenarPor('nombreProducto')">Nombre Producto</th>
+                            <th @@click="ordenarPor('descripcionProducto')">Descripción Producto</th>
+                            <th @@click="ordenarPor('descripcionCategoria')">Descripción Categoria</th>
+                            <th @@click="ordenarPor('descripcionMarca')">Descripción Marca</th>
+                            <th @@click="ordenarPor('precio')">Precio</th>
+                            <th @@click="ordenarPor('estado')">Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="productos in productosPaginados" :key="productos.idProducto">
+                            <td>{{ productos.idProducto }}</td>
+                            <td>{{ productos.nombreProducto }}</td>
+                            <td>{{ productos.descripcionProducto }}</td>
+                            <td>{{ productos.descripcionCategoria }}</td>
+                            <td>{{ productos.descripcionMarca }}</td>
+                            <td>{{ productos.precio }}</td>
+                            <td>{{ productos.estado ? 'Activo' : 'Inactivo' }}</td>
+                            <td>
+                                <button class="btn btn-primary" @@click="abrirModal(producto)">Editar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p v-else>Cargando Productos...</p>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item" :class="{ disabled: paginaActual === 1 }">
+                            <a class="page-link" href="#" @@click.prevent="paginaActual--">&laquo;</a>
+                        </li>
+                        <li v-for="pagina in totalPaginas" :key="pagina" class="page-item" :class="{ active: pagina === paginaActual }">
+                            <a class="page-link" href="#" @@click.prevent="paginaActual = pagina">{{ pagina }}</a>
+                        </li>
+                        <li class="page-item" :class="{ disabled: paginaActual === totalPaginas }">
+                            <a class="page-link" href="#" @@click.prevent="paginaActual++">&raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Modal para editar categoría -->
+                <div :class="['modal', { mostrar: mostrarModal } ]" @@click.self="cerrarModal">
+                    <div class="modal-contenido">
+                        <span class="cerrar" @@click="cerrarModal">&times;</span>
+                        <h3>{{ esNuevoProducto ? 'Nuevo Producto' : 'Editar Producto' }}</h3>
+                        <label>Nombre Producto:</label>
+                        <input type="text" v-model="productoSeleccionado.nombreProducto" class="form-control"><br>
+                        <label>Descripción Producto:</label>
+                        <input type="text" v-model="productoSeleccionado.descripcionProducto" class="form-control"><br>
+                        <label>Descripción Categoría:</label>
+                        <input type="text" v-model="productoSeleccionado.descripcionCategoria" class="form-control"><br>
+                        <label>Descripción Marca:</label>
+                        <input type="text" v-model="productoSeleccionado.descripcionMarca" class="form-control"><br>
+                        <label>Activo:</label>
+                        <select v-model="productoSeleccionado.estado" class="form-control">
+                            <option :value="true">Activo</option>
+                            <option :value="false">Inactivo</option>
+                        </select><br>
+                        <button class="btn btn-success mt-2" @@click="guardarCambios">Guardar</button>
+                    </div>
+                </div>
+
+                <!-- Modal para nueva categoría -->
+                <div :class="['modal', { mostrar: mostrarModalNueva } ]" @@click.self="cerrarModalNueva">
+                    <div class="modal-contenido">
+                        <span class="cerrar" @@click="cerrarModalNueva">&times;</span>
+                        <label>Nombre Producto:</label>
+                        <input type="text" v-model="productoSeleccionado.nombreProducto" class="form-control"><br>
+                        <label>Descripción Producto:</label>
+                        <input type="text" v-model="productoSeleccionado.descripcionProducto" class="form-control"><br>
+                        <label>Descripción Categoría:</label>
+                        <input type="text" v-model="productoSeleccionado.descripcionCategoria" class="form-control"><br>
+                        <label>Descripción Marca:</label>
+                        <input type="text" v-model="productoSeleccionado.descripcionMarca" class="form-control"><br>
+                        <label>Activo:</label>
+                        <select v-model="nuevoProducto.estado" class="form-control">
+                            <option :value="true">Activo</option>
+                            <option :value="false">Inactivo</option>
+                        </select><br>
+                        <button class="btn btn-success mt-2" @@click="guardarNuevaCategoria">Guardar</button>
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </div>
+    </div>
+
+    <!-- SCRIPT Vue.js PARA CATEGORIAS -->
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    productos: [],
+                    paginaActual: 1,
+                    registrosPorPagina: 15,
+                    ordenAsc: true,
+                    columnaOrden: '',
+                    mostrarModal: false,
+                    mostrarModalNueva: false,
+                    productoSeleccionado: {},
+                    nuevoProducto: { descripcionProducto: '', estado: true }
+                };
+            },
+            mounted() {
+                this.obtenerProductos();
+            },
+                computed: {
+            totalPaginas() {
+                return Math.ceil(this.productos.length / this.registrosPorPagina);
+            },
+            productosPaginados() {
+                const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
+                const fin = inicio + this.registrosPorPagina;
+                return this.productos.slice(inicio, fin);
+            }
+        },
+            methods: {
+                async obtenerProductos() {
+                    try {
+                        const response = await axios.get('/Administration/Productos', {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        this.productos = response.data;
+                    } catch (error) {
+                        console.error('Error al obtener Productos:', error);
+                    }
+                },
+                ordenarPor(columna) {
+                    if (this.columnaOrden === columna) {
+                        this.ordenAsc = !this.ordenAsc;
+                    } else {
+                        this.columnaOrden = columna;
+                        this.ordenAsc = true;
+                    }
+                    this.productos.sort((a, b) => {
+                        let valA = a[columna];
+                        let valB = b[columna];
+
+                        if (typeof valA === 'string') valA = valA.toLowerCase();
+                        if (typeof valB === 'string') valB = valB.toLowerCase();
+
+                        return this.ordenAsc ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
+                    });
+                },
+                abrirModal(producto) {
+                    this.productoSeleccionado = { ...producto };
+                    this.mostrarModal = true;
+                },
+                cerrarModal() {
+                    this.mostrarModal = false;
+                },
+                abrirModalNueva() {
+                    this.nuevoProducto = { descripcionCategoria: '', estado: true };
+                    this.mostrarModalNueva = true;
+                },
+                cerrarModalNueva() {
+                    this.mostrarModalNueva = false;
+                },
+                async guardarCambios() {
+                    try {
+                        const response = await axios.put('/Administration/ActualizarProducto', this.categoriaSeleccionada);
+                        alert(response.data);
+                        this.cerrarModal();
+                        this.obtenerProductos(); // Actualiza la lista
+                    } catch (error) {
+                        console.error('Error al actualizar la categoría:', error);
+                        alert('Error al actualizar la categoría');
+                    }
+                },
+                async guardarNuevaCategoria() {
+                    try {
+                        const response = await axios.post('/Administration/CrearProducto', this.nuevaCategoria);
+                        alert(response.data);
+                        this.cerrarModalNueva();
+                        this.obtenerProductos(); // Actualiza la lista
+                    } catch (error) {
+                        console.error('Error al crear la categoría:', error);
+                        alert('Error al crear la categoría');
+                    }
+                },
+                 cambiarPagina(pagina) {
+            if (pagina >= 1 && pagina <= this.totalPaginas) {
+                this.paginaActual = pagina;
+            }
+        }
+            }
+        });
+        app.mount('#app');
+    </script>
+
+    <!-- FIN SCRIPT Vue.js PARA CATEGORIAS -->
+</body>
+</html>

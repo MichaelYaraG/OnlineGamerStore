@@ -12,7 +12,6 @@ namespace OGS.Infraestructure.Repository
     {
         private readonly ApplicationDbContext _context;
 
-        string RutaImagenes = "~\\OnlineGamerStoreAdmin\\wwwroot\\Imagenes\\";
 
         public CategoriaRepository(ApplicationDbContext context)
         {

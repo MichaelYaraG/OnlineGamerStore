@@ -12,17 +12,38 @@ namespace OGS.Domain
     {
         [Key]
         public int IDProducto { get; set; }
-        public string NombreProdcuto { get; set; }
-        public string DescricionProducto { get; set; }
+        public string NombreProducto { get; set; }
+        public string DescripcionProducto { get; set; }
         public decimal Precio { get; set; }
-        public decimal IVAPorcentaje {  get; set; }
+        public decimal IVAPorcentaje { get; set; }
         public decimal IVAValor { get; set; }
-        public Marcas IDMarca { get; set; }
+        public int IDCategoria { get; set; }
+        public int IDMarca { get; set; }
         public int Stock { get; set; }
-        public string RutaImagen {  get; set; }
+        public string RutaImagen { get; set; }
         public string NombreImagen { get; set; }
         public bool Estado { get; set; }
 
+
+    }
+
+    public class ProductosDTO
+    {
+        [Key]
+        public int IDProducto { get; set; }
+        public string NombreProducto { get; set; }
+        public string DescripcionProducto { get; set; } 
+        public decimal Precio { get; set; }
+        public decimal IVAPorcentaje { get; set; }
+        public decimal IVAValor { get; set; }
+        public int IDCategoria { get; set; }
+        public string DescripcionCategoria { get; set; }
+        public int IDMarca { get; set; }
+        public string DescripcionMarca { get; set; }
+        public int Stock { get; set; }
+        public string RutaImagen { get; set; }
+        public string NombreImagen { get; set; }
+        public bool Estado { get; set; }
 
     }
 }

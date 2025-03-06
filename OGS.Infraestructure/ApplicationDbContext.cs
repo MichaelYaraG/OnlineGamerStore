@@ -27,9 +27,10 @@ namespace OGS.Infraestructure
         public DbSet<Clientes> Clientes { get; set; }
         public DbSet<Marcas> Marcas { get; set; }
         public DbSet<Productos> Productos { get; set; }
-       
+        public DbSet<ProductosDTO> ProductosDTO { get; set; }
 
-       
+
+
 
     }
 }

@@ -61,12 +61,63 @@ namespace OnlineGamerStoreAdmin.Controllers
             return resultado ? Ok("Categoría actualizada exitosamente") : StatusCode(500, "Error al actualizar la categoría");
         }
         /// FIN CODIGO CATEGORIAS -----------------------------------------------------------------------------------------------
-        
-        
-        public IActionResult Productos()
+
+        // --------------- CODIGO CORRESPONDIENTE A LA ADMINISTRACION DE PRODUCTOS ---------------------------- //
+        [HttpGet]
+        public async Task<IActionResult> Productos()
         {
-            return View();
+            var productos = await _productoService.GetProductosAsync();
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Json(productos);
+            }
+
+            return View(productos);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CrearCategoria([FromBody] ProductosDTO producto)
+        {
+            if (producto == null || producto.IDProducto <= 0
+                || string.IsNullOrEmpty(producto.DescripcionProducto)
+                || string.IsNullOrEmpty(producto.NombreProducto)
+                || string.IsNullOrEmpty(producto.NombreImagen)
+                || producto.IDMarca == 0
+                || string.IsNullOrEmpty(producto.NombreImagen)
+                || producto.IDCategoria == 0
+                || producto.Precio < 0
+                || producto.Precio < 0)
+            {
+                return BadRequest("Datos inválidos");
+            }
+
+            var resultado = await _productoService.CrearProductoAsync(producto);
+            return resultado ? Ok("Producto creado exitosamente") : StatusCode(500, "Error al crear el producto");
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ActualizarProductoAsync([FromBody] ProductosDTO producto)
+        {
+            if (producto == null || producto.IDProducto <= 0 
+                || string.IsNullOrEmpty(producto.DescripcionProducto) 
+                || string.IsNullOrEmpty(producto.NombreProducto)
+                || string.IsNullOrEmpty(producto.NombreImagen)
+                || producto.IDMarca == 0
+                || string.IsNullOrEmpty(producto.NombreImagen)
+                || producto.IDCategoria == 0
+                || producto.Precio < 0
+                || producto.Precio < 0)
+            {
+                return BadRequest("Datos inválidos");
+            }
+
+            var resultado = await _productoService.ActualizarProductoAsync(producto); 
+            return resultado ? Ok("Producto actualizado exitosamente") : StatusCode(500, "Error al actualizar el producto");
+        }
+        /// FIN CODIGO CATEGORIAS -----------------------------------------------------------------------------------------------
+
+
         public IActionResult Marcas()
         {
             return View();
