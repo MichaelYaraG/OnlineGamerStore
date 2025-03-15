@@ -28,11 +28,14 @@
                     <thead>
                         <tr>
                             <th @@click="ordenarPor('idProducto')">ID</th>
-                            <th @@click="ordenarPor('nombreProducto')">Nombre Producto</th>
+                            <th @@click="ordenarPor('nombreProducto')">Producto</th>
                             <th @@click="ordenarPor('descripcionProducto')">Descripción Producto</th>
-                            <th @@click="ordenarPor('descripcionCategoria')">Descripción Categoria</th>
-                            <th @@click="ordenarPor('descripcionMarca')">Descripción Marca</th>
-                            <th @@click="ordenarPor('precio')">Precio</th>
+                            <th @@click="ordenarPor('descripcionCategoria')">Categoria</th>
+                            <th @@click="ordenarPor('descripcionMarca')">Marca</th>
+                            <th @@click="ordenarPor('ivaValor')">Valor IVA</th>
+                            <th @@click="ordenarPor('precio')">Precio Sin Iva</th>
+                            <th @@click="ordenarPor('precioConIva')">Precio Total</th>
+                            <th @@click="ordenarPor('stock')">Stock</th>
                             <th @@click="ordenarPor('estado')">Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -44,16 +47,23 @@
                             <td>{{ productos.descripcionProducto }}</td>
                             <td>{{ productos.descripcionCategoria }}</td>
                             <td>{{ productos.descripcionMarca }}</td>
-                            <td>{{ productos.precio }}</td>
+                            <td>{{ formatoMoneda(productos.ivaValor) }}</td>
+                            <td>{{ formatoMoneda(productos.precio) }}</td>
+                            <td>{{ formatoMoneda(productos.precioConIva) }}</td>
+                            <td>{{ productos.stock }}</td>
                             <td>{{ productos.estado ? 'Activo' : 'Inactivo' }}</td>
                             <td>
-                                <button class="btn btn-primary" @@click="abrirModal(producto)">Editar</button>
+                                <button class="btn btn-primary" @@click="abrirModal(productos)">Editar</button>
+                                <button type="button" class="btn btn-danger" @@click="eliminarProducto(productos.idProducto)">Eliminar</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
                 <p v-else>Cargando Productos...</p>
-                <nav aria-label="Page navigation example">
+
+
+                <!-- Paginacion de Datos en Tabla -->
+                <nav aria-label="Paginacion Tabla">
                     <ul class="pagination">
                         <li class="page-item" :class="{ disabled: paginaActual === 1 }">
                             <a class="page-link" href="#" @@click.prevent="paginaActual--">&laquo;</a>
@@ -77,14 +87,31 @@
                         <label>Descripción Producto:</label>
                         <input type="text" v-model="productoSeleccionado.descripcionProducto" class="form-control"><br>
                         <label>Descripción Categoría:</label>
-                        <input type="text" v-model="productoSeleccionado.descripcionCategoria" class="form-control"><br>
+                        <select v-model="productoSeleccionado.idCategoria" class="form-control">
+                            <option v-for="categoria in categorias" :key="categoria.idCategoria" :value="categoria.idCategoria">
+                                {{ categoria.descripcionCategoria }}
+                            </option>
+                        </select>
                         <label>Descripción Marca:</label>
-                        <input type="text" v-model="productoSeleccionado.descripcionMarca" class="form-control"><br>
+                        <select v-model="productoSeleccionado.idMarca" class="form-control">
+                            <option v-for="marca in marcas" :key="marca.idMarca" :value="marca.idMarca">
+                                {{ marca.descripcionMarca }}
+                            </option>
+                        </select>
+                        <label>Precio:</label>
+                        <input type="number" v-model="productoSeleccionado.precio" class="form-control"><br>
+                        <label>Stock:</label>
+                        <input type="number" v-model="productoSeleccionado.stock" class="form-control"><br>
                         <label>Activo:</label>
                         <select v-model="productoSeleccionado.estado" class="form-control">
                             <option :value="true">Activo</option>
                             <option :value="false">Inactivo</option>
                         </select><br>
+                        <label>Imagen del Producto:</label>
+                        <input type="file" ref="ArchivoImagen" @@change="cargarImagen"  name="imagen"class="form-control"><br>
+                        <div v-if="productoSeleccionado.vistaPreviaImagen" class="imagen-previa-container">
+                            <img :src="productoSeleccionado.vistaPreviaImagen" alt="Vista previa" class="imagen-previa">
+                        </div>
                         <button class="btn btn-success mt-2" @@click="guardarCambios">Guardar</button>
                     </div>
                 </div>
@@ -94,23 +121,40 @@
                     <div class="modal-contenido">
                         <span class="cerrar" @@click="cerrarModalNueva">&times;</span>
                         <label>Nombre Producto:</label>
-                        <input type="text" v-model="productoSeleccionado.nombreProducto" class="form-control"><br>
+                        <input type="text" v-model="nuevoProducto.nombreProducto" class="form-control"><br>
                         <label>Descripción Producto:</label>
-                        <input type="text" v-model="productoSeleccionado.descripcionProducto" class="form-control"><br>
+                        <input type="text" v-model="nuevoProducto.descripcionProducto" class="form-control"><br>
                         <label>Descripción Categoría:</label>
-                        <input type="text" v-model="productoSeleccionado.descripcionCategoria" class="form-control"><br>
+                        <select v-model="nuevoProducto.idCategoria">
+                            <option v-for="categoria in categorias" :key="categoria.idCategoria" :value="categoria.idCategoria">
+                                {{ categoria.descripcionCategoria }}
+                            </option>
+                        </select>
                         <label>Descripción Marca:</label>
-                        <input type="text" v-model="productoSeleccionado.descripcionMarca" class="form-control"><br>
+                        <select v-model="nuevoProducto.idMarca" class="form-control">
+                            <option v-for="marca in marcas" :key="marca.idMarca" :value="marca.idMarca">
+                                {{ marca.descripcionMarca }}
+                            </option>
+                        </select>
+                        <label>Precio:</label>
+                        <input type="number" v-model="nuevoProducto.precio" class="form-control"><br>
+                        <label>Stock:</label>
+                        <input type="number" v-model="nuevoProducto.stock" class="form-control"><br>
+                        <label>Activo:</label>
                         <label>Activo:</label>
                         <select v-model="nuevoProducto.estado" class="form-control">
                             <option :value="true">Activo</option>
                             <option :value="false">Inactivo</option>
                         </select><br>
-                        <button class="btn btn-success mt-2" @@click="guardarNuevaCategoria">Guardar</button>
+                        <label>Imagen del Producto:</label>
+                        <input type="file" ref="ArchivoImagen" @@change="cargarImagen" name="imagen" class="form-control"><br>
+                        <div v-if="nuevoProducto.vistaPreviaImagen" class="imagen-previa-container">
+                            <img :src="nuevoProducto.vistaPreviaImagen" alt="Vista previa" class="imagen-previa">
+                        </div>
+                        <button class="btn btn-success mt-2" @@click="guardarNuevoProducto">Guardar</button>
                     </div>
                 </div>
             </div>
-            <hr />
         </div>
     </div>
 
@@ -121,21 +165,39 @@
             data() {
                 return {
                     productos: [],
+                    vistaPreviaImagen: null,
                     paginaActual: 1,
                     registrosPorPagina: 15,
                     ordenAsc: true,
                     columnaOrden: '',
+                    categorias:[],
+                    categoriaSeleccionada: null,
+                    marcas:[],
+                    marcaSeleccionada: null,
                     mostrarModal: false,
                     mostrarModalNueva: false,
                     productoSeleccionado: {},
-                    nuevoProducto: { descripcionProducto: '', estado: true }
+                    nuevoProducto: {
+                        nombreProducto: '',
+                        descripcionProducto: '',
+                        estado: true,
+                        idCategoria: null,
+                        idMarca: null,
+                        rutaImagen: null,
+                        nombreImagen: null,
+                    },
                 };
             },
             mounted() {
                 this.obtenerProductos();
+                this.DDLCategorias();
+                this.DDLMarcas();
+
             },
                 computed: {
             totalPaginas() {
+
+
                 return Math.ceil(this.productos.length / this.registrosPorPagina);
             },
             productosPaginados() {
@@ -155,6 +217,30 @@
                         console.error('Error al obtener Productos:', error);
                     }
                 },
+                formatoMoneda(valor) {
+                return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(valor);
+                },
+
+                async DDLCategorias() {
+                    try {
+                        const response = await axios.get('/Administration/DDLCategorias', {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        this.categorias = response.data;
+                    } catch (error) {
+                        console.error('Error al obtener Categorias:', error);
+                    }
+                },
+                async DDLMarcas() {
+                    try {
+                        const response = await axios.get('/Administration/DDLMarcas', {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        this.marcas = response.data;
+                    } catch (error) {
+                        console.error('Error al obtener Marcas:', error);
+                    }
+                },
                 ordenarPor(columna) {
                     if (this.columnaOrden === columna) {
                         this.ordenAsc = !this.ordenAsc;
@@ -172,15 +258,20 @@
                         return this.ordenAsc ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
                     });
                 },
-                abrirModal(producto) {
-                    this.productoSeleccionado = { ...producto };
+                abrirModal(productos) {
+                    this.productoSeleccionado = JSON.parse(JSON.stringify(productos));
+                    if (this.productoSeleccionado.rutaImagen) {
+                        this.productoSeleccionado.vistaPreviaImagen = `/imagenes/${this.productoSeleccionado.rutaImagen}`;
+                    } else {
+                        this.productoSeleccionado.vistaPreviaImagen = null;
+                    }
                     this.mostrarModal = true;
                 },
                 cerrarModal() {
                     this.mostrarModal = false;
                 },
                 abrirModalNueva() {
-                    this.nuevoProducto = { descripcionCategoria: '', estado: true };
+                    this.nuevoProducto = { nombreProducto: '', descripcionProducto:'', estado: true, nombreImagen:'', rutaImagen:'' };
                     this.mostrarModalNueva = true;
                 },
                 cerrarModalNueva() {
@@ -188,31 +279,96 @@
                 },
                 async guardarCambios() {
                     try {
-                        const response = await axios.put('/Administration/ActualizarProducto', this.categoriaSeleccionada);
+                        const response = await axios.put('/Administration/ActualizarProducto', this.productoSeleccionado);
                         alert(response.data);
                         this.cerrarModal();
-                        this.obtenerProductos(); // Actualiza la lista
+                        this.obtenerProductos(); 
                     } catch (error) {
-                        console.error('Error al actualizar la categoría:', error);
-                        alert('Error al actualizar la categoría');
+                        console.error('Error al actualizar el producto:', error);
+                        alert('Error al actualizar el producto');
                     }
+                       
                 },
-                async guardarNuevaCategoria() {
+                async guardarNuevoProducto() {
+                     //console.log("Enviando nuevo producto:", this.nuevoProducto); 
                     try {
-                        const response = await axios.post('/Administration/CrearProducto', this.nuevaCategoria);
+                        const response = await axios.post('/Administration/CrearProducto', this.nuevoProducto);
                         alert(response.data);
                         this.cerrarModalNueva();
-                        this.obtenerProductos(); // Actualiza la lista
+                        this.obtenerProductos(); 
                     } catch (error) {
-                        console.error('Error al crear la categoría:', error);
-                        alert('Error al crear la categoría');
+                        console.error('Error al crear el producto:', error);
+                        alert('Error al crear el producto');
                     }
                 },
-                 cambiarPagina(pagina) {
-            if (pagina >= 1 && pagina <= this.totalPaginas) {
-                this.paginaActual = pagina;
-            }
-        }
+                async eliminarProducto(idProducto) {
+                    if (!confirm("¿Estás seguro de eliminar este producto?")) return;
+
+                    // console.log("ID del producto a eliminar:", idProducto);
+
+                    try {
+                        const response = await axios.post(`/Administration/EliminarProducto`,
+                            { IDProducto: idProducto },
+                            { headers: { 'Content-Type': 'application/json' } }
+                        );
+
+                        console.log("Producto eliminado correctamente:", response.data);
+                        //alert('Producto eliminado correctamente');
+                        this.obtenerProductos(); 
+                    } catch (error) {
+                        console.error("Error al eliminar el producto:", error.response ? error.response.data : error.message);
+                        alert('Error al eliminar el producto');
+                    }
+                },
+                cargarImagen(event) {
+                     const archivo = event.target.files[0];
+                     if (!archivo) {
+                         alert("No se ha seleccionado ningún archivo.");
+                         return;
+                     }
+
+                     const formData = new FormData();
+                     formData.append("imagen", archivo);
+
+                     fetch("/Administration/SubirImagen", {
+                         method: "POST",
+                         body: formData
+                     })
+                     .then(response => {
+                         if (!response.ok) {
+                             return response.text().then(text => { throw new Error(text); });
+                         }
+                         return response.json();
+                     })
+                     .then(data => {
+                        // console.log("Imagen guardada:", data); 
+
+                         if (!data || !data.nombreImagen) {
+                             throw new Error("Respuesta inválida del servidor");
+                         }
+
+                         if (this.mostrarModal) {
+                             this.productoSeleccionado.nombreImagen = data.nombreImagen;
+                             this.productoSeleccionado.rutaImagen = `/imagenes/${data.nombreImagen}`;
+                             this.productoSeleccionado.vistaPreviaImagen = this.productoSeleccionado.rutaImagen;
+                         } else {
+                             this.nuevoProducto.nombreImagen = data.nombreImagen;
+                             this.nuevoProducto.rutaImagen = `/imagenes/${data.nombreImagen}`;
+                             this.nuevoProducto.vistaPreviaImagen = this.nuevoProducto.rutaImagen;
+                         }
+
+                         console.log("Datos actualizados:", this.nuevoProducto, this.productoSeleccionado);
+                     })
+                     .catch(error => {
+                         console.error("Error al subir la imagen:", error);
+                         alert(error.message);
+                     });
+
+                    this.nuevoProducto.nombreImagen = data.nombreImagen;
+                    this.productoSeleccionado.nombreImagen = data.nombreImagen;
+                    this.nuevoProducto.vistaPreviaImagen = this.nuevoProducto.rutaImagen;
+                    this.productoSeleccionado.vistaPreviaImagen = this.productoSeleccionado.rutaImagen;
+                }
             }
         });
         app.mount('#app');

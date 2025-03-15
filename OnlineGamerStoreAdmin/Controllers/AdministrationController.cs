@@ -3,6 +3,7 @@ using OGS.Application.Services;
 using OGS.Application;
 using OGS.Infraestructure;
 using OGS.Domain;
+using OGS.Infraestructure.Repository;
 
 namespace OnlineGamerStoreAdmin.Controllers
 {
@@ -77,17 +78,16 @@ namespace OnlineGamerStoreAdmin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CrearCategoria([FromBody] ProductosDTO producto)
+        public async Task<IActionResult> CrearProducto([FromBody] ProductosDTO producto)
         {
-            if (producto == null || producto.IDProducto <= 0
-                || string.IsNullOrEmpty(producto.DescripcionProducto)
+            if (producto == null || string.IsNullOrEmpty(producto.DescripcionProducto)
                 || string.IsNullOrEmpty(producto.NombreProducto)
-                || string.IsNullOrEmpty(producto.NombreImagen)
+                //|| string.IsNullOrEmpty(producto.NombreImagen)
                 || producto.IDMarca == 0
-                || string.IsNullOrEmpty(producto.NombreImagen)
+                //|| string.IsNullOrEmpty(producto.NombreImagen)
                 || producto.IDCategoria == 0
-                || producto.Precio < 0
                 || producto.Precio < 0)
+                //|| producto.Precio < 0)
             {
                 return BadRequest("Datos inválidos");
             }
@@ -102,11 +102,7 @@ namespace OnlineGamerStoreAdmin.Controllers
             if (producto == null || producto.IDProducto <= 0 
                 || string.IsNullOrEmpty(producto.DescripcionProducto) 
                 || string.IsNullOrEmpty(producto.NombreProducto)
-                || string.IsNullOrEmpty(producto.NombreImagen)
-                || producto.IDMarca == 0
-                || string.IsNullOrEmpty(producto.NombreImagen)
-                || producto.IDCategoria == 0
-                || producto.Precio < 0
+                || producto.Stock < 0
                 || producto.Precio < 0)
             {
                 return BadRequest("Datos inválidos");
@@ -115,7 +111,60 @@ namespace OnlineGamerStoreAdmin.Controllers
             var resultado = await _productoService.ActualizarProductoAsync(producto); 
             return resultado ? Ok("Producto actualizado exitosamente") : StatusCode(500, "Error al actualizar el producto");
         }
-        /// FIN CODIGO CATEGORIAS -----------------------------------------------------------------------------------------------
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarProductoAsync([FromBody] EliminarProductoRequest data)
+        {
+            if (data == null || data.IDProducto == 0)
+            {
+                return BadRequest("Datos inválidos");
+            }
+            int IDProducto = data.IDProducto;
+            var resultado = await _productoService.EliminarProductoAsync(IDProducto);
+            return resultado ? Ok("Producto eliminado exitosamente") : StatusCode(500, "Error al eliminar el producto");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubirImagenAsync(IFormFile imagen)
+        {
+            if (imagen == null || imagen.Length == 0)
+            {
+                return BadRequest(new { message = "No se ha proporcionado ninguna imagen." });
+            }
+
+            try
+            {
+                
+                var nombreArchivo = imagen.FileName;
+                var ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagenes", nombreArchivo);
+
+                using (var stream = new FileStream(ruta, FileMode.Create))
+                {
+                    await imagen.CopyToAsync(stream);
+                }
+
+                return Ok(new { nombreImagen = nombreArchivo, rutaImagen = $"/imagenes/{nombreArchivo}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al guardar la imagen.", error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DDLMarcas() 
+        {
+            var marcas = await _productoService.ObtenerMarcasAsync();
+            return Ok(marcas);
+        }
+        [HttpGet]
+        public async Task<IActionResult> DDLCategorias()
+        {
+            var categorias = await _productoService.ObtenerCategoriasAsync();
+            return Ok(categorias);
+        }
+
+        /// FIN CODIGO PRODUCTOS -----------------------------------------------------------------------------------------------
 
 
         public IActionResult Marcas()

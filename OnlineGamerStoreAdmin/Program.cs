@@ -7,6 +7,7 @@ using OGS.Application;
 using OGS.Domain;
 using OGS.Infraestructure.Repository;
 using OGS.Application.Services;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,10 @@ builder.Services.AddScoped<ProductoRepository>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<ClienteRepository>();
 builder.Services.AddScoped<ClienteService>();
-
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // Permitir archivos de hasta 10MB
+});
 
 // Construir la aplicación
 var app = builder.Build();
@@ -43,7 +47,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

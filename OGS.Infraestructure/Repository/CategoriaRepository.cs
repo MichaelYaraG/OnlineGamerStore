@@ -32,7 +32,7 @@ namespace OGS.Infraestructure.Repository
 
         public async Task<bool> ActualizarCategoriaAsync(Categorias categoria)
         {
-            var result = await _context.Database.ExecuteSqlRawAsync("EXEC  OGS.spActualizarCategoria @p0, @p1, @p2", categoria.IDCategoria, categoria.DescripcionCategoria, categoria.Estado);
+            var result = await _context.Database.ExecuteSqlRawAsync("EXEC OGS.spActualizarCategoria @p0, @p1, @p2", categoria.IDCategoria, categoria.DescripcionCategoria, categoria.Estado);
             return result > 0;
         }
     }

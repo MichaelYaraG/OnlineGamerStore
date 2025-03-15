@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +17,7 @@ namespace OGS.Domain
         public string NombreProducto { get; set; }
         public string DescripcionProducto { get; set; }
         public decimal Precio { get; set; }
+        public decimal PrecioConIva { get; set; }
         public decimal IVAPorcentaje { get; set; }
         public decimal IVAValor { get; set; }
         public int IDCategoria { get; set; }
@@ -32,8 +35,9 @@ namespace OGS.Domain
         [Key]
         public int IDProducto { get; set; }
         public string NombreProducto { get; set; }
-        public string DescripcionProducto { get; set; } 
+        public string DescripcionProducto { get; set; }
         public decimal Precio { get; set; }
+        public decimal PrecioConIva { get; set; }
         public decimal IVAPorcentaje { get; set; }
         public decimal IVAValor { get; set; }
         public int IDCategoria { get; set; }
@@ -45,5 +49,11 @@ namespace OGS.Domain
         public string NombreImagen { get; set; }
         public bool Estado { get; set; }
 
+
+    }
+
+    public class EliminarProductoRequest
+    {
+        public int IDProducto { get; set; }
     }
 }

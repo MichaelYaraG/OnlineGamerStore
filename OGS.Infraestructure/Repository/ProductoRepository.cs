@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using OGS.Domain;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +14,6 @@ namespace OGS.Infraestructure.Repository
     {
         private readonly ApplicationDbContext _context;
 
-        string Ruta = "~\\OnlineGamerStoreAdmin\\wwwroot\\Imagenes\\";
 
 
         public ProductoRepository(ApplicationDbContext context)
@@ -26,20 +27,61 @@ namespace OGS.Infraestructure.Repository
                 .FromSqlRaw("OGS.spListaDeProductos")
                 .ToListAsync();
         }
-        public async Task<bool> AgregarProductoAsync(ProductosDTO productos)
+        public async Task<bool> CrearProductoAsync(ProductosDTO productos)
         {
-            string RutaImagen = Ruta + productos.NombreImagen;
-            var result = await _context.Database.ExecuteSqlRawAsync("EXEC OGS.spCrearProducto @p0, @p1, p2, @p3, @p4, @p5, @p6, @p7, @p8", 
-                productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock, RutaImagen, productos.NombreImagen);
+            var RutaImagen = "wwwroot/Imagenes/" + productos.NombreImagen;
+            var result = await _context.Database.ExecuteSqlRawAsync("EXEC OGS.spCrearProducto @p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8",
+            productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock, RutaImagen, productos.NombreImagen);
+            //productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock);
             return result > 0;
         }
 
         public async Task<bool> ActualizarProductoAsync(ProductosDTO productos)
         {
-            string RutaImagen = Ruta + productos.NombreImagen;
-            var result = await _context.Database.ExecuteSqlRawAsync("EXEC  OGS.spActualizarProducto @p0, @p1, p2, @p3, @p4, @p5, @p6, @p7, @p8, @p10", 
-                productos.IDProducto, productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock, productos.NombreImagen, RutaImagen);
+            var RutaImagen = "wwwroot/Imagenes/" + productos.NombreImagen;
+            var result = await _context.Database.ExecuteSqlRawAsync("EXEC OGS.spActualizarProducto @p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9",
+            productos.IDProducto, productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock, productos.NombreImagen, RutaImagen);
+            //productos.IDProducto, productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock);
             return result > 0;
         }
+
+        public async Task<bool> EliminarProductoAsync(int IDProducto)
+        {
+            var result = await _context.Database.ExecuteSqlRawAsync("EXEC OGS.spEliminarProducto @p0", IDProducto);
+            return result > 0;
+        }
+
+        public string GuardarImagenAsync(IFormFile imagen)
+        {
+            if (imagen == null || imagen.Length == 0)
+                return null;
+
+            string nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
+            string ruta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagenes", nombreArchivo);
+
+            using (var stream = new FileStream(ruta, FileMode.Create))
+            {
+                imagen.CopyTo(stream);
+            }
+
+            return nombreArchivo; 
+        }
+
+        //---------- DDL Marcas y Categorias --------------//
+
+        public async Task<IEnumerable<Marcas>> ObtenerMarcasAsync() 
+        {
+            return await _context.Marcas
+                .FromSqlRaw("OGS.spMarcasDDL")
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Categorias>> ObtenerCategoriasAsync()
+        {
+            return await _context.Categorias
+                .FromSqlRaw("OGS.spCategoriasDDL")
+                .ToListAsync();
+        }
+
     }
 }

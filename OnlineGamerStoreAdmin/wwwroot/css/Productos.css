@@ -91,3 +91,24 @@ h1 {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.imagen-previa-container {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.imagen-previa {
+    max-width: 200px;
+    max-height: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+}
