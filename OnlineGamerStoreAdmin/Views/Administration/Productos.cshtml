@@ -55,6 +55,7 @@
                             <td>
                                 <button class="btn btn-primary" @@click="abrirModal(productos)">Editar</button>
                                 <button type="button" class="btn btn-danger" @@click="eliminarProducto(productos.idProducto)">Eliminar</button>
+                                <button type="button" class="btn btn-dark" @@click="abrirModalDetalle(productos)">Detalle</button>
                             </td>
                         </tr>
                     </tbody>
@@ -108,7 +109,7 @@
                             <option :value="false">Inactivo</option>
                         </select><br>
                         <label>Imagen del Producto:</label>
-                        <input type="file" ref="ArchivoImagen" @@change="cargarImagen"  name="imagen"class="form-control"><br>
+                        <input type="file" ref="ArchivoImagen" @@change="cargarImagen" name="imagen" class="form-control"><br>
                         <div v-if="productoSeleccionado.vistaPreviaImagen" class="imagen-previa-container">
                             <img :src="productoSeleccionado.vistaPreviaImagen" alt="Vista previa" class="imagen-previa">
                         </div>
@@ -154,6 +155,29 @@
                         <button class="btn btn-success mt-2" @@click="guardarNuevoProducto">Guardar</button>
                     </div>
                 </div>
+
+                <!-- Modal para detalle de producto -->
+                <div :class="['modal', { mostrar: mostrarModalDetalle } ]" @@click.self="cerrarModalDetalle">
+                    <div class="modal-contenido">
+                        <h2 style="font-weight: bold; ">Detalle de Producto</h2>
+                        <hr />
+                        <p><b>Nombre Producto: </b>{{ productoSeleccionado.nombreProducto }}</p>
+                        <p><b>Descripción Producto: </b>{{ productoSeleccionado.descripcionProducto }}</p>
+                        <p><b>Categoria: </b>{{ productoSeleccionado.descripcionCategoria }}</p>
+                        <p><b>Marca: </b>{{ productoSeleccionado.descripcionMarca }}</p>
+                        <p><b>Stock: </b>{{ productoSeleccionado.stock }}</p>
+                        <p><b>Precio Base: </b>{{ formatoMoneda(productoSeleccionado.precio) }}</p>
+                        <p><b>Valor Iva Producto: </b>{{ formatoMoneda(productoSeleccionado.ivaValor) }}</p>
+                        <p><b>Precio + Iva: </b>{{ formatoMoneda(productoSeleccionado.precioConIva) }}</p>
+                        <p><b>Estado Producto: </b>{{ productoSeleccionado.estado ? 'Activo' : 'Inactivo' }}</p>
+                        <p><b>Fecha Registro: </b>{{ new Date(productoSeleccionado.fechaRegistro).toLocaleDateString() }}</p>
+                        <div v-if="productoSeleccionado.rutaImagen" class="imagen-previa-container">
+                            <img :src="`/imagenes/${productoSeleccionado.nombreImagen}`" alt="Imagen del Producto" class="imagen-previa">
+                        </div>
+
+                        <button class="btn btn-secondary mt-3" @@click="cerrarModalDetalle">Cerrar</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -174,8 +198,9 @@
                     categoriaSeleccionada: null,
                     marcas:[],
                     marcaSeleccionada: null,
-                    mostrarModal: false,
                     mostrarModalNueva: false,
+                    mostrarModal: false,
+                    mostrarModalDetalle: false,
                     productoSeleccionado: {},
                     nuevoProducto: {
                         nombreProducto: '',
@@ -282,20 +307,28 @@
                         const response = await axios.put('/Administration/ActualizarProducto', this.productoSeleccionado);
                         alert(response.data);
                         this.cerrarModal();
-                        this.obtenerProductos(); 
+                        this.obtenerProductos();
                     } catch (error) {
                         console.error('Error al actualizar el producto:', error);
                         alert('Error al actualizar el producto');
                     }
-                       
+
+                },
+                abrirModalDetalle(productos){
+                    this.productoSeleccionado = JSON.parse(JSON.stringify(productos));
+                    this.mostrarModalDetalle = true;
+
+                },
+                cerrarModalDetalle() {
+                    this.mostrarModalDetalle = false;
                 },
                 async guardarNuevoProducto() {
-                     //console.log("Enviando nuevo producto:", this.nuevoProducto); 
+                     //console.log("Enviando nuevo producto:", this.nuevoProducto);
                     try {
                         const response = await axios.post('/Administration/CrearProducto', this.nuevoProducto);
                         alert(response.data);
                         this.cerrarModalNueva();
-                        this.obtenerProductos(); 
+                        this.obtenerProductos();
                     } catch (error) {
                         console.error('Error al crear el producto:', error);
                         alert('Error al crear el producto');
@@ -314,7 +347,7 @@
 
                         console.log("Producto eliminado correctamente:", response.data);
                         //alert('Producto eliminado correctamente');
-                        this.obtenerProductos(); 
+                        this.obtenerProductos();
                     } catch (error) {
                         console.error("Error al eliminar el producto:", error.response ? error.response.data : error.message);
                         alert('Error al eliminar el producto');
@@ -341,7 +374,7 @@
                          return response.json();
                      })
                      .then(data => {
-                        // console.log("Imagen guardada:", data); 
+                        // console.log("Imagen guardada:", data);
 
                          if (!data || !data.nombreImagen) {
                              throw new Error("Respuesta inválida del servidor");

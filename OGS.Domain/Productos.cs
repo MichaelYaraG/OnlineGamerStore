@@ -48,6 +48,7 @@ namespace OGS.Domain
         public string RutaImagen { get; set; }
         public string NombreImagen { get; set; }
         public bool Estado { get; set; }
+        public DateTime FechaRegistro { get; set; }
 
 
     }

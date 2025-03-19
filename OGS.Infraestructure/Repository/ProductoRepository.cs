@@ -29,7 +29,7 @@ namespace OGS.Infraestructure.Repository
         }
         public async Task<bool> CrearProductoAsync(ProductosDTO productos)
         {
-            var RutaImagen = "wwwroot/Imagenes/" + productos.NombreImagen;
+            var RutaImagen = "Imagenes/" + productos.NombreImagen;
             var result = await _context.Database.ExecuteSqlRawAsync("EXEC OGS.spCrearProducto @p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8",
             productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock, RutaImagen, productos.NombreImagen);
             //productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock);
@@ -38,7 +38,7 @@ namespace OGS.Infraestructure.Repository
 
         public async Task<bool> ActualizarProductoAsync(ProductosDTO productos)
         {
-            var RutaImagen = "wwwroot/Imagenes/" + productos.NombreImagen;
+            var RutaImagen = "Imagenes/" + productos.NombreImagen;
             var result = await _context.Database.ExecuteSqlRawAsync("EXEC OGS.spActualizarProducto @p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9",
             productos.IDProducto, productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock, productos.NombreImagen, RutaImagen);
             //productos.IDProducto, productos.DescripcionProducto, productos.Estado, productos.NombreProducto, productos.Precio, productos.IDMarca, productos.IDCategoria, productos.Stock);
