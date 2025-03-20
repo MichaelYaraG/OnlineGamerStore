@@ -61,7 +61,74 @@ namespace OnlineGamerStoreAdmin.Controllers
             var resultado = await _categoriaService.ActualizarCategoriaAsync(categoria);
             return resultado ? Ok("Categoría actualizada exitosamente") : StatusCode(500, "Error al actualizar la categoría");
         }
+
+        public async Task<IActionResult> EliminarCategoriaAsync([FromBody] EliminarCategoriaRequest data)
+        {
+            if (data == null || data.IDCategoria == 0)
+            {
+                return BadRequest("Datos inválidos");
+            }
+            int IDCategoria = data.IDCategoria;
+            var resultado = await _categoriaService.EliminarCategoriaAsync(IDCategoria);
+            return resultado ? Ok("Categoría eliminada exitosamente") : StatusCode(500, "Error al eliminar la categoría");
+        }
+
         /// FIN CODIGO CATEGORIAS -----------------------------------------------------------------------------------------------
+
+
+        //--------------- CODIGO CORRESPONDIENTE A LA ADMINISTRACION DE MARCAS ---------------------------- //
+
+
+        [HttpGet]
+
+        public async Task<IActionResult> Marcas()
+        {
+            var marcas = await _marcaService.GetMarcasAsync();
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Json(marcas);
+            }
+            return View(marcas);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CrearMarca([FromBody] Marcas marca)
+        {
+            if (marca == null || string.IsNullOrEmpty(marca.DescripcionMarca))
+            {
+                return BadRequest("Datos inválidos");
+            }
+            var resultado = await _marcaService.CrearMarcaAsync(marca);
+            return resultado ? Ok("Marca creada exitosamente") : StatusCode(500, "Error al crear la marca");
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ActualizarMarcaAsync([FromBody] Marcas marca)
+        {
+            if (marca == null || marca.IDMarca <= 0 || string.IsNullOrEmpty(marca.DescripcionMarca))
+            {
+                return BadRequest("Datos inválidos");
+            }
+            var resultado = await _marcaService.ActualizarMarcaAsync(marca);
+            return resultado ? Ok("Marca actualizada exitosamente") : StatusCode(500, "Error al actualizar la marca");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarMarcaAsync([FromBody] EliminarMarcaRequest data)
+        {
+            if (data == null || data.IDMarca == 0)
+            {
+                return BadRequest("Datos inválidos");
+            }
+            int IDMarca = data.IDMarca;
+            var resultado = await _marcaService.EliminarMarcaAsync(IDMarca);
+            return resultado ? Ok("Marca eliminada exitosamente") : StatusCode(500, "Error al eliminar la marca");
+        }
+
+
+
+
+        // FIN CODIGO MARCAS -----------------------------------------------------------------------------------------------
 
         // --------------- CODIGO CORRESPONDIENTE A LA ADMINISTRACION DE PRODUCTOS ---------------------------- //
         [HttpGet]
@@ -167,10 +234,6 @@ namespace OnlineGamerStoreAdmin.Controllers
         /// FIN CODIGO PRODUCTOS -----------------------------------------------------------------------------------------------
 
 
-        public IActionResult Marcas()
-        {
-            return View();
-        }
         public IActionResult GenerarVenta()
         {
             return View();

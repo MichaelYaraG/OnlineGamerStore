@@ -286,7 +286,7 @@
                 abrirModal(productos) {
                     this.productoSeleccionado = JSON.parse(JSON.stringify(productos));
                     if (this.productoSeleccionado.rutaImagen) {
-                        this.productoSeleccionado.vistaPreviaImagen = `/imagenes/${this.productoSeleccionado.rutaImagen}`;
+                        this.productoSeleccionado.vistaPreviaImagen = `/imagenes/${this.productoSeleccionado.nombreImagen}`;
                     } else {
                         this.productoSeleccionado.vistaPreviaImagen = null;
                     }

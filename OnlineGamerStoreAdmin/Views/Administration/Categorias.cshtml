@@ -40,6 +40,7 @@
                             <td>{{ categoria.estado ? 'Activo' : 'Inactivo' }}</td>
                             <td>
                                 <button class="btn btn-primary" @@click="abrirModal(categoria)">Editar</button>
+                                <button type="button" class="btn btn-danger" @@click="eliminarCategoria(categoria.idCategoria)">Eliminar</button>
                             </td>
                         </tr>
                     </tbody>
@@ -189,7 +190,24 @@
                         alert('Error al crear la categoría');
                     }
                 },
-                 cambiarPagina(pagina) {
+                async eliminarCategoria(idCategoria) {
+                    if (!confirm('¿Está seguro de eliminar la categoría?')) return;
+
+                    try {
+                        const response = await axios.post(`/Administration/EliminarCategoria`,
+                        { IDCategoria: idCategoria },
+                        { headers: { 'Content-type' : 'application/json' } }
+                        );
+
+                        alert(response.data);
+                        this.obtenerCategorias(); // Actualiza la lista
+                    } catch (error) {
+                        console.error('Error al eliminar la categoría:', error, idCategoria);
+                        alert('Error al eliminar la categoría');
+                    }
+                    
+            },
+                cambiarPagina(pagina) {
             if (pagina >= 1 && pagina <= this.totalPaginas) {
                 this.paginaActual = pagina;
             }

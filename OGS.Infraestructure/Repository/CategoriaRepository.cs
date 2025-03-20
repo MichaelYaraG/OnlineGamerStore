@@ -35,5 +35,11 @@ namespace OGS.Infraestructure.Repository
             var result = await _context.Database.ExecuteSqlRawAsync("EXEC OGS.spActualizarCategoria @p0, @p1, @p2", categoria.IDCategoria, categoria.DescripcionCategoria, categoria.Estado);
             return result > 0;
         }
+
+        public async Task<bool> EliminarCategoriaAsync(int IDCategoria)
+        {
+            var result = await _context.Database.ExecuteSqlRawAsync("EXEC OGS.spEliminarCategoria @p0", IDCategoria);
+            return result > 0;
+        }
     }
 }

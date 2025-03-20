@@ -14,4 +14,9 @@ namespace OGS.Domain
         public string DescripcionMarca { get; set; }
         public bool Estado { get; set; }
     }
+
+    public class EliminarMarcaRequest
+    {
+        public int IDMarca { get; set; }
+    }
 }

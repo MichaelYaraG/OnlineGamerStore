@@ -30,5 +30,11 @@ namespace OGS.Application.Services
         {
             return await _repository.ActualizarCategoriaAsync(categoria);
         }
+
+        public async Task<bool> EliminarCategoriaAsync(int IDCategoria)
+        {
+            
+            return await _repository.EliminarCategoriaAsync(IDCategoria);
+        }
     }
 }

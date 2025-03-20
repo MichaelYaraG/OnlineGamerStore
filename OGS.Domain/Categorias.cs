@@ -15,4 +15,9 @@ namespace OGS.Domain
         public bool Estado {  get; set; }
 
     }
+
+    public class EliminarCategoriaRequest
+    {
+        public int IDCategoria { get; set; }
+    }
 }
