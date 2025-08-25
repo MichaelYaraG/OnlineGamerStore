@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace OGS.Domain
 {
-    public class UserRoles
+    public class UsuariosRoles
     {
         [Key]
         public int IDUsuarioRol { get; set; }
-        public Users IDUsuario { get; set; }
+        public Usuarios IDUsuario { get; set; }
         public Roles IDRol { get; set; }
         public bool Estado {  get; set; }
 

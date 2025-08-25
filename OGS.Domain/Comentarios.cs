@@ -11,7 +11,7 @@ namespace OGS.Domain
     {
         [Key]
         public int IDComentario { get; set; }
-        public Users IDUser { get; set; }
+        public int IDUsuario { get; set; }
         public string Comentario { get; set; }
         public bool Estado { get; set; }
 

@@ -11,8 +11,8 @@ namespace OGS.Domain
     {
         [Key]
         public int IDCarrito { get; set; }
-        public Users IDUsuario { get; set; }
-        public Productos IDProducto { get; set; }
+        public int IDUsuario { get; set; }
+        public int IDProducto { get; set; }
         public int Cantidad { get; set; }
 
     }

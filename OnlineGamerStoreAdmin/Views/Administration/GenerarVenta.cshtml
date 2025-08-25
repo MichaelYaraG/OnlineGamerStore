@@ -1,3 +1,184 @@
-﻿<div class="text-center">
-    <h1 class="display-4">Generar Venta</h1>
-</div>
+﻿@* @{
+    ViewData["Title"] = "Lista de ventas";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/OnlineGamerStoreAdmin.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ventas.css" asp-append-version="true" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <div class="card">
+        <h2 class="card-header">Administración De ventas</h2>
+        <div class="card-body">
+            <div id="app">
+                <button type="button" class="btn btn-success" @@click="abrirModalNueva">Nueva venta</button>
+                <hr />
+                <h5>Lista de ventas</h5>
+                <table v-if="ventas.length > 0" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th @@click="ordenarPor('idventa')">ID</th>
+                            <th @@click="ordenarPor('nombreventa')">venta</th>
+                            <th @@click="ordenarPor('descripcionventa')">Descripción venta</th>
+                            <th @@click="ordenarPor('descripcionCategoria')">Categoria</th>
+                            <th @@click="ordenarPor('descripcionMarca')">Marca</th>
+                            <th @@click="ordenarPor('ivaValor')">Valor IVA</th>
+                            <th @@click="ordenarPor('precio')">Precio Sin Iva</th>
+                            <th @@click="ordenarPor('precioConIva')">Precio Total</th>
+                            <th @@click="ordenarPor('stock')">Stock</th>
+                            <th @@click="ordenarPor('estado')">Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="ventas in ventasPaginados" :key="ventas.idventa">
+                            <td>{{ ventas.idventa }}</td>
+                            <td>{{ ventas.nombreventa }}</td>
+                            <td>{{ ventas.descripcionventa }}</td>
+                            <td>{{ ventas.descripcionCategoria }}</td>
+                            <td>{{ ventas.descripcionMarca }}</td>
+                            <td>{{ formatoMoneda(ventas.ivaValor) }}</td>
+                            <td>{{ formatoMoneda(ventas.precio) }}</td>
+                            <td>{{ formatoMoneda(ventas.precioConIva) }}</td>
+                            <td>{{ ventas.stock }}</td>
+                            <td>{{ ventas.estado ? 'Activo' : 'Inactivo' }}</td>
+                            <td>
+                                <button class="btn btn-primary" @@click="abrirModal(ventas)">Editar</button>
+                                <button type="button" class="btn btn-danger" @@click="eliminarventa(ventas.idventa)">Eliminar</button>
+                                <button type="button" class="btn btn-dark" @@click="abrirModalDetalle(ventas)">Detalle</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p v-else>Cargando ventas...</p>
+
+
+                <!-- Paginacion de Datos en Tabla -->
+                <nav aria-label="Paginacion Tabla">
+                    <ul class="pagination">
+                        <li class="page-item" :class="{ disabled: paginaActual === 1 }">
+                            <a class="page-link" href="#" @@click.prevent="paginaActual--">&laquo;</a>
+                        </li>
+                        <li v-for="pagina in totalPaginas" :key="pagina" class="page-item" :class="{ active: pagina === paginaActual }">
+                            <a class="page-link" href="#" @@click.prevent="paginaActual = pagina">{{ pagina }}</a>
+                        </li>
+                        <li class="page-item" :class="{ disabled: paginaActual === totalPaginas }">
+                            <a class="page-link" href="#" @@click.prevent="paginaActual++">&raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Modal para editar categoría -->
+                <div :class="['modal', { mostrar: mostrarModal } ]" @@click.self="cerrarModal">
+                    <div class="modal-contenido">
+                        <span class="cerrar" @@click="cerrarModal">&times;</span>
+                        <h3>{{ esNuevoventa ? 'Nuevo venta' : 'Editar venta' }}</h3>
+                        <label>Nombre venta:</label>
+                        <input type="text" v-model="ventaSeleccionado.nombreventa" class="form-control"><br>
+                        <label>Descripción venta:</label>
+                        <input type="text" v-model="ventaSeleccionado.descripcionventa" class="form-control"><br>
+                        <label>Descripción Categoría:</label>
+                        <select v-model="ventaSeleccionado.idCategoria" class="form-control">
+                            <option v-for="categoria in categorias" :key="categoria.idCategoria" :value="categoria.idCategoria">
+                                {{ categoria.descripcionCategoria }}
+                            </option>
+                        </select>
+                        <label>Descripción Marca:</label>
+                        <select v-model="ventaSeleccionado.idMarca" class="form-control">
+                            <option v-for="marca in marcas" :key="marca.idMarca" :value="marca.idMarca">
+                                {{ marca.descripcionMarca }}
+                            </option>
+                        </select>
+                        <label>Precio:</label>
+                        <input type="number" v-model="ventaSeleccionado.precio" class="form-control"><br>
+                        <label>Stock:</label>
+                        <input type="number" v-model="ventaSeleccionado.stock" class="form-control"><br>
+                        <label>Activo:</label>
+                        <select v-model="ventaSeleccionado.estado" class="form-control">
+                            <option :value="true">Activo</option>
+                            <option :value="false">Inactivo</option>
+                        </select><br>
+                        <label>Imagen del venta:</label>
+                        <input type="file" ref="ArchivoImagen" @@change="cargarImagen" name="imagen" class="form-control"><br>
+                        <div v-if="ventaSeleccionado.vistaPreviaImagen" class="imagen-previa-container">
+                            <img :src="ventaSeleccionado.vistaPreviaImagen" alt="Vista previa" class="imagen-previa">
+                        </div>
+                        <button class="btn btn-success mt-2" @@click="guardarCambios">Guardar</button>
+                    </div>
+                </div>
+
+                <!-- Modal para nueva categoría -->
+                <div :class="['modal', { mostrar: mostrarModalNueva } ]" @@click.self="cerrarModalNueva">
+                    <div class="modal-contenido">
+                        <span class="cerrar" @@click="cerrarModalNueva">&times;</span>
+                        <label>Nombre venta:</label>
+                        <input type="text" v-model="nuevoventa.nombreventa" class="form-control"><br>
+                        <label>Descripción venta:</label>
+                        <input type="text" v-model="nuevoventa.descripcionventa" class="form-control"><br>
+                        <label>Descripción Categoría:</label>
+                        <select v-model="nuevoventa.idCategoria">
+                            <option v-for="categoria in categorias" :key="categoria.idCategoria" :value="categoria.idCategoria">
+                                {{ categoria.descripcionCategoria }}
+                            </option>
+                        </select>
+                        <label>Descripción Marca:</label>
+                        <select v-model="nuevoventa.idMarca" class="form-control">
+                            <option v-for="marca in marcas" :key="marca.idMarca" :value="marca.idMarca">
+                                {{ marca.descripcionMarca }}
+                            </option>
+                        </select>
+                        <label>Precio:</label>
+                        <input type="number" v-model="nuevoventa.precio" class="form-control"><br>
+                        <label>Stock:</label>
+                        <input type="number" v-model="nuevoventa.stock" class="form-control"><br>
+                        <label>Activo:</label>
+                        <label>Activo:</label>
+                        <select v-model="nuevoventa.estado" class="form-control">
+                            <option :value="true">Activo</option>
+                            <option :value="false">Inactivo</option>
+                        </select><br>
+                        <label>Imagen del venta:</label>
+                        <input type="file" ref="ArchivoImagen" @@change="cargarImagen" name="imagen" class="form-control"><br>
+                        <div v-if="nuevoventa.vistaPreviaImagen" class="imagen-previa-container">
+                            <img :src="nuevoventa.vistaPreviaImagen" alt="Vista previa" class="imagen-previa">
+                        </div>
+                        <button class="btn btn-success mt-2" @@click="guardarNuevoventa">Guardar</button>
+                    </div>
+                </div>
+
+                <!-- Modal para detalle de venta -->
+                <div :class="['modal', { mostrar: mostrarModalDetalle } ]" @@click.self="cerrarModalDetalle">
+                    <div class="modal-contenido">
+                        <h2 style="font-weight: bold; ">Detalle de venta</h2>
+                        <hr />
+                        <p><b>Nombre venta: </b>{{ ventaSeleccionado.nombreventa }}</p>
+                        <p><b>Descripción venta: </b>{{ ventaSeleccionado.descripcionventa }}</p>
+                        <p><b>Categoria: </b>{{ ventaSeleccionado.descripcionCategoria }}</p>
+                        <p><b>Marca: </b>{{ ventaSeleccionado.descripcionMarca }}</p>
+                        <p><b>Stock: </b>{{ ventaSeleccionado.stock }}</p>
+                        <p><b>Precio Base: </b>{{ formatoMoneda(ventaSeleccionado.precio) }}</p>
+                        <p><b>Valor Iva venta: </b>{{ formatoMoneda(ventaSeleccionado.ivaValor) }}</p>
+                        <p><b>Precio + Iva: </b>{{ formatoMoneda(ventaSeleccionado.precioConIva) }}</p>
+                        <p><b>Estado venta: </b>{{ ventaSeleccionado.estado ? 'Activo' : 'Inactivo' }}</p>
+                        <p><b>Fecha Registro: </b>{{ new Date(ventaSeleccionado.fechaRegistro).toLocaleDateString() }}</p>
+                        <div v-if="ventaSeleccionado.rutaImagen" class="imagen-previa-container">
+                            <img :src="`/imagenes/${ventaSeleccionado.nombreImagen}`" alt="Imagen del venta" class="imagen-previa">
+                        </div>
+
+                        <button class="btn btn-secondary mt-3" @@click="cerrarModalDetalle">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html> *@

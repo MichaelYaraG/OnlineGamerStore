@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OGS.Domain
 {
-    public class Users
+    public class Usuarios
     {
         [Key]
         public int IDUsuario { get; set; }

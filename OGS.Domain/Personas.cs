@@ -11,9 +11,9 @@ namespace OGS.Domain
     {
         [Key]
         public int IDPersona { get; set; }
-        public TipoPersona IDTipoPersona { get; set; }
-        public Users IDUsuario {  get; set; }
-        public TipoDocumento IDTipoDocumento { get; set; }
+        public int IDTipoPersona { get; set; }
+        public int IDUsuario {  get; set; }
+        public int IDTipoDocumento { get; set; }
         public int NumeroDocumento { get; set; }
         public DateTime FechaNacimiento { get; set; }
         public string Nombre2 { get; set; }
@@ -21,7 +21,7 @@ namespace OGS.Domain
         public string Apellido2 { get; set; }
         public string NombreCompleto { get; set; }
         public string CorreoElectronico { get; set; }
-        public Sexo IDSexo {  get; set; }
+        public int IDSexo {  get; set; }
         public int Telefono { get; set; }
         public int Edad {  get; set; }
         public string Direccion1 { get; set; }

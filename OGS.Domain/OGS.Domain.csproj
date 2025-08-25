@@ -238,8 +238,8 @@
     <Compile Include="Sexo.cs" />
     <Compile Include="TipoDocumento.cs" />
     <Compile Include="TipoPersona.cs" />
-    <Compile Include="UserRoles.cs" />
-    <Compile Include="Users.cs" />
+    <Compile Include="UsuariosRoles.cs" />
+    <Compile Include="Usuarios.cs" />
     <Compile Include="Ventas.cs" />
   </ItemGroup>
   <ItemGroup>
